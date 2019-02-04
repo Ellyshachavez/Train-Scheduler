@@ -13,7 +13,7 @@ var config = {
   
   var database = firebase.database();
   
-  // 2. Button for adding Employees
+  // Button for adding train
   $("#add-train-btn").on("click", function(event) {
     event.preventDefault();
   
@@ -23,7 +23,7 @@ var config = {
     var trainTime = moment($("#time-input").val().trim(), "HH:mm").format("X");
     var trainFreq = $("#min-input").val().trim();
   
-    // Creates local "temporary" object for holding employee data
+    // Creates local "temporary" object for holding train data
     var newTrain = {
       name: trainName,
       destination: trainDestiny,
@@ -31,7 +31,7 @@ var config = {
       frequency: trainFreq
     };
   
-    // Uploads employee data to the database
+    // Uploads train data to the database
     database.ref().push(newTrain);
   
     // Logs everything to console
@@ -40,7 +40,7 @@ var config = {
     console.log(newTrain.time);
     console.log(newTrain.frequency);
   
-    alert("Train coming!");
+    
   
     // Clears all of the text-boxes
     $("#train-name-input").val("");
@@ -55,9 +55,9 @@ var config = {
   
     // Store everything into a variable.
     var trainName = childSnapshot.val().name;
-    var trainDestiny = childSnapshot.val().role;
-    var trainTime = childSnapshot.val().start;
-    var trainFreq = childSnapshot.val().rate;
+    var trainDestiny = childSnapshot.val().destination;
+    var trainTime = childSnapshot.val().time;
+    var trainFreq = childSnapshot.val().frequency;
   
     // Employee Info
     console.log(trainName);
@@ -65,37 +65,39 @@ var config = {
     console.log(trainTime);
     console.log(trainFreq);
   
-    // Prettify the employee start
-    var trainStartPretty = moment.unix(trainStart).format("HH:mm");
-  
+    var trainPretty = moment.unix(trainConverted).format("HH:mm");
     // Calculate the months worked using hardcore math
     // To calculate the months worked
-    var trainMins = moment().diff(moment(trainStart, "X"), "mins");
-    console.log(trainMins);
+    var trainConverted = moment(trainTime, "X").subtract(1, "years");
+
+    var currentTime = moment();
+    console.log("current time: " + moment(currentTime).format("HH:mm"));
+
+    var diffTime = moment().diff(moment(trainConverted), "minutes");
+    console.log("Diff in time: " + diffTime )
+
+   var tRemainder = diffTime % trainFreq;
+   console.log(tRemainder);
+
+    var trainMins = trainFreq - tRemainder;
+    console.log("mins till train: " + trainMins);
+
+    // Next train Arrival
+    var trainNext = moment().add(trainMins, "minutes")
+    console.log("arrive: " + moment(trainNext).format("HH:mm"));
+    convertTime = moment(trainNext).format("hh:mm A");
   
-    // Calculate the frequency
-    var trainFreq = trainMins * trainRate;
-    console.log(trainFreq);
-  
+   
     // Create the new row
     var newRow = $("<tr>").append(
       $("<td>").text(trainName),
-      $("<td>").text(trainRole),
-      $("<td>").text(trainStartPretty),
-      $("<td>").text(trainMins),
-      $("<td>").text(trainRate),
+      $("<td>").text(trainDestiny),
+      $("<td>").text(trainPretty),
+      $("<td>").text(trainTime),
       $("<td>").text(trainFreq)
     );
   
     // Append the new row to the table
     $("#train-table > tbody").append(newRow);
   });
-  
-  // Example Time Math
-  // -----------------------------------------------------------------------------
-  // Assume Employee start date of January 1, 2015
-  // Assume current date is March 1, 2016
-  
-  // We know that this is 15 months.
-  // Now we will create code in moment.js to confirm that any attempt we use meets this test case
   

@@ -49,7 +49,7 @@ var config = {
     $("#min-input").val("");
   });
   
-  // 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
+  // 3. Create Firebase event for adding train to the database and a row in the html when a user adds an entry
   database.ref().on("child_added", function(childSnapshot) {
     console.log(childSnapshot.val());
   
@@ -59,25 +59,24 @@ var config = {
     var trainTime = childSnapshot.val().time;
     var trainFreq = childSnapshot.val().frequency;
   
-    // Employee Info
+    // train Info
     console.log(trainName);
     console.log(trainDestiny);
     console.log(trainTime);
     console.log(trainFreq);
   
-    var trainPretty = moment.unix(trainConverted).format("HH:mm");
-    // Calculate the months worked using hardcore math
-    // To calculate the months worked
+    // moment.js time converter
     var trainConverted = moment(trainTime, "X").subtract(1, "years");
-
+    
+    //tells current time
     var currentTime = moment();
     console.log("current time: " + moment(currentTime).format("HH:mm"));
 
     var diffTime = moment().diff(moment(trainConverted), "minutes");
-    console.log("Diff in time: " + diffTime )
+    console.log("diff in time: " + diffTime )
 
-   var tRemainder = diffTime % trainFreq;
-   console.log(tRemainder);
+    var tRemainder = diffTime % trainFreq;
+    console.log(tRemainder);
 
     var trainMins = trainFreq - tRemainder;
     console.log("mins till train: " + trainMins);
@@ -87,14 +86,15 @@ var config = {
     console.log("arrive: " + moment(trainNext).format("HH:mm"));
     convertTime = moment(trainNext).format("hh:mm A");
   
-   
+    var trainPretty = moment.unix(trainConverted).format("HH:mm");
+
     // Create the new row
     var newRow = $("<tr>").append(
       $("<td>").text(trainName),
       $("<td>").text(trainDestiny),
-      $("<td>").text(trainPretty),
-      $("<td>").text(trainTime),
-      $("<td>").text(trainFreq)
+      $("<td>").text(trainFreq),
+      $("<td>").text(trainNext),
+      $("<td>").text(trainMins)
     );
   
     // Append the new row to the table
